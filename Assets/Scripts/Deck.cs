@@ -34,6 +34,18 @@ public class Deck : MonoBehaviour
          * En principio, la posición de cada valor se deberá corresponder con la posición de faces. 
          * Por ejemplo, si en faces[1] hay un 2 de corazones, en values[1] debería haber un 2.
          */
+
+
+
+        //CREAMOS EL ARRAY DE POSIBLES VALORES DE LAS CARTAS
+        int[] valores = { 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10 };
+        //RECORREMOS UN FOR PARA ASIGNARLE LOS VALORES A VALUES
+        //VALUES ES UNA LISTA DE 52 ELEMENTOS IGUAL QUE VALORES
+        for (int i = 0; i < values.Length; i++)
+        {
+            values[i] = valores[i];//ASSIGNAMOS
+        }
+
     }
 
     private void ShuffleCards()
