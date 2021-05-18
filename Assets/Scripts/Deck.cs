@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Deck : MonoBehaviour
@@ -11,6 +12,11 @@ public class Deck : MonoBehaviour
     public Button playAgainButton;
     public Text finalMessage;
     public Text probMessage;
+    //cartas para hacer shuffle
+    ArrayList cartasSacadas = new ArrayList();
+    //PUNTOS DEL DEALER Y DEL JUGADOR
+    public Text puntosPlayer;
+    public Text puntosDealer;
 
     public int[] values = new int[52];
     int cardIndex = 0;    
@@ -50,11 +56,27 @@ public class Deck : MonoBehaviour
 
     private void ShuffleCards()
     {
+
         /*TODO:
          * Barajar las cartas aleatoriamente.
          * El método Random.Range(0,n), devuelve un valor entre 0 y n-1
          * Si lo necesitas, puedes definir nuevos arrays.
-         */       
+         */
+        //declaramos una variable donde guardara un numero de 0  a 52
+        int posicionAleatoria = Random.Range(0, 52);
+
+        //si el assrai contiene a la posicion
+        if (cartasSacadas.Contains(posicionAleatoria))
+        {
+            ShuffleCards();
+        }
+        else//sino
+        {
+            cardIndex = posicionAleatoria;
+            cartasSacadas.Add(posicionAleatoria);
+        }
+
+
     }
 
     void StartGame()
@@ -67,6 +89,22 @@ public class Deck : MonoBehaviour
              * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
              */
         }
+        puntosPlayer.text = player.GetComponent<CardHand>().points.ToString();
+        if (player.GetComponent<CardHand>().points == 21)
+        {
+            finalMessage.text = "HAS HECHO BLACKJACK A LA PRIMERA";
+            hitButton.interactable = false;
+
+            stickButton.interactable = false;
+
+        }
+        if (dealer.GetComponent<CardHand>().points == 21)
+        {
+            finalMessage.text = "Blackjack!   HAS PERDIDO";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+        }
+
     }
 
     private void CalculateProbabilities()
