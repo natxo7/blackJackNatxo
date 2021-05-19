@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class Deck : MonoBehaviour
 {
+    System.Random variableRandom = new System.Random();
     public Sprite[] faces;
     public GameObject dealer;
     public GameObject player;
@@ -13,14 +14,25 @@ public class Deck : MonoBehaviour
     public Text finalMessage;
     public Text probMessage;
     //cartas para hacer shuffle
-    ArrayList cartasSacadas = new ArrayList();
+    public Sprite[] facesCopia;
     //PUNTOS DEL DEALER Y DEL JUGADOR
     public Text puntosPlayer;
     public Text puntosDealer;
 
     public int[] values = new int[52];
     int cardIndex = 0;    
-       
+      public int extraerValorSprite(Sprite sprite)
+      {
+        int valorAdevolver = 0;
+        for(int i = 0; i < faces.Length; i++)
+        {
+            if (sprite == faces[i])
+            {
+                valorAdevolver = values[i];
+            }
+        }
+        return valorAdevolver;
+      } 
     private void Awake()
     {    
         InitCardValues();        
@@ -29,7 +41,8 @@ public class Deck : MonoBehaviour
 
     private void Start()
     {
-        ShuffleCards();
+        facesCopia = new  Sprite[52];
+    ShuffleCards();
         StartGame();        
     }
 
@@ -53,7 +66,21 @@ public class Deck : MonoBehaviour
         }
 
     }
-
+  
+    public T[] barajar<T>(T[] array)
+    {
+        var random = variableRandom;
+        for (int i = array.Length; i > 1; i--)
+        {
+            // Pick random element to swap.
+            int j = random.Next(i); // 0 <= j <= i-1
+                                    // Swap.
+            T tmp = array[j];
+            array[j] = array[i - 1];
+            array[i - 1] = tmp;
+        }
+        return array;
+    }
     private void ShuffleCards()
     {
 
@@ -63,20 +90,11 @@ public class Deck : MonoBehaviour
          * Si lo necesitas, puedes definir nuevos arrays.
          */
         //declaramos una variable donde guardara un numero de 0  a 52
-        int posicionAleatoria = Random.Range(0, 52);
-
-        //si el assrai contiene a la posicion
-        if (cartasSacadas.Contains(posicionAleatoria))
+        for(int i = 0; i < faces.Length; i++)
         {
-            ShuffleCards();
+            facesCopia[i] = faces[i];
         }
-        else//sino
-        {
-            cardIndex = posicionAleatoria;
-            cartasSacadas.Add(posicionAleatoria);
-        }
-
-
+        facesCopia = barajar(facesCopia);
     }
 
     void StartGame()
@@ -122,7 +140,7 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Dependiendo de cómo se implemente ShuffleCards, es posible que haya que cambiar el índice.
          */
-        dealer.GetComponent<CardHand>().Push(faces[cardIndex],values[cardIndex]);
+        dealer.GetComponent<CardHand>().Push(facesCopia[cardIndex],extraerValorSprite(facesCopia[cardIndex]));
         cardIndex++;        
     }
 
@@ -131,7 +149,7 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Dependiendo de cómo se implemente ShuffleCards, es posible que haya que cambiar el índice.
          */
-        player.GetComponent<CardHand>().Push(faces[cardIndex], values[cardIndex]/*,cardCopy*/);
+        player.GetComponent<CardHand>().Push(facesCopia[cardIndex], extraerValorSprite(facesCopia[cardIndex])/*,cardCopy*/);
         cardIndex++;
         CalculateProbabilities();
     }       
