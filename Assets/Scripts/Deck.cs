@@ -18,7 +18,14 @@ public class Deck : MonoBehaviour
     //PUNTOS DEL DEALER Y DEL JUGADOR
     public Text puntosPlayer;
     public Text puntosDealer;
+    //PARA LAS APUESTAS
+    public Button apuesta10Button;
 
+    public Text apuestaMessage;
+    public Text BancaMessage;
+    int banca = 1000;
+    int apuesta = 0;
+    
     public int[] values = new int[52];
     int cardIndex = 0;    
       public int extraerValorSprite(Sprite sprite)
@@ -99,28 +106,45 @@ public class Deck : MonoBehaviour
 
     void StartGame()
     {
+        apuesta = 0;
+        actualizarBanca();
+        
         for (int i = 0; i < 2; i++)
         {
             PushPlayer();
             PushDealer();
-            /*TODO:
-             * Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
-             */
         }
+        //SIRVE PARA MOSTRAR LOS PUNTOS 
+        //ES UNA COMPROVACIÓN
+
         puntosPlayer.text = player.GetComponent<CardHand>().points.ToString();
+        puntosDealer.text = dealer.GetComponent<CardHand>().points.ToString();
+
+        //Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
+
         if (player.GetComponent<CardHand>().points == 21)
         {
+            apuesta10Button.interactable = false;
             finalMessage.text = "HAS HECHO BLACKJACK A LA PRIMERA";
             hitButton.interactable = false;
-
             stickButton.interactable = false;
+            banca += apuesta * 2;
+    
+            actualizarBanca();
+           
 
         }
         if (dealer.GetComponent<CardHand>().points == 21)
         {
+            apuesta10Button.interactable = false;
             finalMessage.text = "Blackjack!   HAS PERDIDO";
             hitButton.interactable = false;
             stickButton.interactable = false;
+            dealer.GetComponent<CardHand>().cards[0].GetComponent<CardModel>().ToggleFace(true);
+            banca += 0;
+       
+            actualizarBanca();
+           
         }
 
     }
@@ -159,40 +183,143 @@ public class Deck : MonoBehaviour
         /*TODO: 
          * Si estamos en la mano inicial, debemos voltear la primera carta del dealer.
          */
-        
+ 
         //Repartimos carta al jugador
         PushPlayer();
 
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
-         */      
+         */
+        apuesta10Button.interactable = false;
+        if (player.GetComponent<CardHand>().points > 21)
+        {
+            finalMessage.text = "Tu puntuación es mayor que 21";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+            banca += 0;
+           
+            actualizarBanca();
+           
+        }
 
     }
 
     public void Stand()
     {
+        
+
+
         /*TODO: 
          * Si estamos en la mano inicial, debemos voltear la primera carta del dealer.
          */
 
         /*TODO:
          * Repartimos cartas al dealer si tiene 16 puntos o menos
+        
          * El dealer se planta al obtener 17 puntos o más
          * Mostramos el mensaje del que ha ganado
-         */                
-         
+         */
+
+        //Repartimos cartas al dealer si tiene 16 puntos o menos
+      
+        apuesta10Button.interactable = false;
+
+        while (dealer.GetComponent<CardHand>().points <= 16)
+        {
+            PushDealer();
+        }
+        if (dealer.GetComponent<CardHand>().points > player.GetComponent<CardHand>().points)
+        {
+           
+            finalMessage.text = "HAS PERDIDO";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+            // dealer.GetComponent<CardModel>().ToggleFace(true); 
+            dealer.GetComponent<CardHand>().cards[0].GetComponent<CardModel>().ToggleFace(true);
+            banca += 0;
+           
+            actualizarBanca();
+           
+
+        }
+        if (player.GetComponent<CardHand>().points > dealer.GetComponent<CardHand>().points)
+        {
+            
+            finalMessage.text = "HAS GANADO";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+
+            dealer.GetComponent<CardHand>().cards[0].GetComponent<CardModel>().ToggleFace(true);
+            banca += apuesta * 2;
+            
+            actualizarBanca();
+            
+
+        }
+        if (player.GetComponent<CardHand>().points == dealer.GetComponent<CardHand>().points)
+        {
+           
+            finalMessage.text = "EMPATE";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+            banca += apuesta;
+            dealer.GetComponent<CardHand>().cards[0].GetComponent<CardModel>().ToggleFace(true);
+            
+
+
+        }
+        if ( dealer.GetComponent<CardHand>().points>21)
+        {
+
+            finalMessage.text = "PIERDE EL DEALER SE HA PASADO DE 21";
+            hitButton.interactable = false;
+            stickButton.interactable = false;
+
+            dealer.GetComponent<CardHand>().cards[0].GetComponent<CardModel>().ToggleFace(true);
+            banca += apuesta * 2;
+       
+            actualizarBanca();
+            
+
+        }
+
+
+
     }
 
     public void PlayAgain()
     {
-        hitButton.interactable = true;
-        stickButton.interactable = true;
+        
+
         finalMessage.text = "";
         player.GetComponent<CardHand>().Clear();
-        dealer.GetComponent<CardHand>().Clear();          
+        dealer.GetComponent<CardHand>().Clear();
+        hitButton.interactable = true;
+        stickButton.interactable = true;
+        apuesta10Button.interactable = true;
         cardIndex = 0;
         ShuffleCards();
         StartGame();
     }
-    
+
+
+    public void add10()
+    {
+        if (banca > 10)
+        {
+
+            apuesta += 10;
+            banca -= 10;
+            actualizarBanca();
+            
+        }
+    }
+    private void actualizarBanca()
+    {
+        
+        apuestaMessage.text = apuesta.ToString();
+        
+        BancaMessage.text =banca.ToString();
+    }
+
 }

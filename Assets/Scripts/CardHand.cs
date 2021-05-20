@@ -40,6 +40,7 @@ public class CardHand : MonoBehaviour
 
     public void Push(Sprite front, int value)
     {
+       
         //Creamos una carta y la añadimos a nuestra mano
         GameObject cardCopy = (GameObject)Instantiate(card);
         cards.Add(cardCopy);
