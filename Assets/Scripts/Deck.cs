@@ -20,7 +20,7 @@ public class Deck : MonoBehaviour
     public Text puntosDealer;
     //PARA LAS APUESTAS
     public Button apuesta10Button;
-
+    public Button resta10Button;
     public Text apuestaMessage;
     public Text BancaMessage;
     int banca = 1000;
@@ -28,6 +28,8 @@ public class Deck : MonoBehaviour
     
     public int[] values = new int[52];
     int cardIndex = 0;    
+
+    //PARA SACAR EL VALOR DE LA CARTA
       public int extraerValorSprite(Sprite sprite)
       {
         int valorAdevolver = 0;
@@ -48,7 +50,7 @@ public class Deck : MonoBehaviour
 
     private void Start()
     {
-        facesCopia = new  Sprite[52];
+        facesCopia = new  Sprite[52];//Sprite
     ShuffleCards();
         StartGame();        
     }
@@ -73,7 +75,7 @@ public class Deck : MonoBehaviour
         }
 
     }
-  
+  //metodo que baraja cartas 
     public T[] barajar<T>(T[] array)
     {
         var random = variableRandom;
@@ -96,16 +98,17 @@ public class Deck : MonoBehaviour
          * El método Random.Range(0,n), devuelve un valor entre 0 y n-1
          * Si lo necesitas, puedes definir nuevos arrays.
          */
-        //declaramos una variable donde guardara un numero de 0  a 52
+        
         for(int i = 0; i < faces.Length; i++)
         {
-            facesCopia[i] = faces[i];
+            facesCopia[i] = faces[i];//asignamos los valores 
         }
         facesCopia = barajar(facesCopia);
     }
 
     void StartGame()
     {
+        //PARA LAS APUESTAS
         apuesta = 0;
         actualizarBanca();
         
@@ -122,6 +125,7 @@ public class Deck : MonoBehaviour
 
         //Si alguno de los dos obtiene Blackjack, termina el juego y mostramos mensaje
 
+        //player tiene 21 
         if (player.GetComponent<CardHand>().points == 21)
         {
             apuesta10Button.interactable = false;
@@ -134,6 +138,7 @@ public class Deck : MonoBehaviour
            
 
         }
+        //dealer tiene 21
         if (dealer.GetComponent<CardHand>().points == 21)
         {
             apuesta10Button.interactable = false;
@@ -164,6 +169,7 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Dependiendo de cómo se implemente ShuffleCards, es posible que haya que cambiar el índice.
          */
+        //he cambiado el parametro 2 y he añadido extarerValorSprite
         dealer.GetComponent<CardHand>().Push(facesCopia[cardIndex],extraerValorSprite(facesCopia[cardIndex]));
         cardIndex++;        
     }
@@ -190,7 +196,10 @@ public class Deck : MonoBehaviour
         /*TODO:
          * Comprobamos si el jugador ya ha perdido y mostramos mensaje
          */
+        //una vez se pide carta ya no se puede apostar
+        resta10Button.interactable = false;
         apuesta10Button.interactable = false;
+        //si el player tiene mas de 21
         if (player.GetComponent<CardHand>().points > 21)
         {
             finalMessage.text = "Tu puntuación es mayor que 21";
@@ -206,7 +215,7 @@ public class Deck : MonoBehaviour
 
     public void Stand()
     {
-        
+
 
 
         /*TODO: 
@@ -220,10 +229,10 @@ public class Deck : MonoBehaviour
          * Mostramos el mensaje del que ha ganado
          */
 
-        //Repartimos cartas al dealer si tiene 16 puntos o menos
-      
+     //cuando nos plantamos ya no podemos apostar
+        resta10Button.interactable = false;
         apuesta10Button.interactable = false;
-
+        //Repartimos cartas al dealer si tiene 16 puntos o menos
         while (dealer.GetComponent<CardHand>().points <= 16)
         {
             PushDealer();
@@ -289,23 +298,29 @@ public class Deck : MonoBehaviour
 
     public void PlayAgain()
     {
-        
-
-        finalMessage.text = "";
-        player.GetComponent<CardHand>().Clear();
-        dealer.GetComponent<CardHand>().Clear();
-        hitButton.interactable = true;
-        stickButton.interactable = true;
-        apuesta10Button.interactable = true;
-        cardIndex = 0;
-        ShuffleCards();
-        StartGame();
+        if (banca >= 10)
+        {
+            resta10Button.interactable = true;
+            finalMessage.text = "";
+            player.GetComponent<CardHand>().Clear();
+            dealer.GetComponent<CardHand>().Clear();
+            hitButton.interactable = true;
+            stickButton.interactable = true;
+            apuesta10Button.interactable = true;
+            cardIndex = 0;
+            ShuffleCards();
+            StartGame();
+        }
+        else
+        {
+            Debug.Log("no te quedan monedas");
+        }
     }
 
-
+    //metodo para apostaar 10 del boton 
     public void add10()
     {
-        if (banca > 10)
+        if (banca >= 10)
         {
 
             apuesta += 10;
@@ -314,7 +329,17 @@ public class Deck : MonoBehaviour
             
         }
     }
-    private void actualizarBanca()
+    //metodo para restar 10 del boton
+    public void restar10()
+    {
+        if (apuesta >= 10)
+        {
+            apuesta -= 10;
+            banca += 10;
+            actualizarBanca();
+        }
+    }
+    private void actualizarBanca()//para actualizar los carteles de dentro del juego
     {
         
         apuestaMessage.text = apuesta.ToString();
