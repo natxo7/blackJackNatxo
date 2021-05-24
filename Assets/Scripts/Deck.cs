@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +26,15 @@ public class Deck : MonoBehaviour
     public Text BancaMessage;
     int banca = 1000;
     int apuesta = 0;
-    
+    //PARA LA PROBABILIDAD
+    public Text prob1;
+   
+   
+
+
+
+
+
     public int[] values = new int[52];
     int cardIndex = 0;    
 
@@ -153,15 +162,52 @@ public class Deck : MonoBehaviour
         }
 
     }
-
+  
     private void CalculateProbabilities()
     {
+
         /*TODO:
          * Calcular las probabilidades de:
-         * - Teniendo la carta oculta, probabilidad de que el dealer tenga más puntuación que el jugador
+         * - Teniendo la carta oculta, probabilidad de que el dealer tenga más puntuación que el jugador      
          * - Probabilidad de que el jugador obtenga entre un 17 y un 21 si pide una carta
          * - Probabilidad de que el jugador obtenga más de 21 si pide una carta          
          */
+        /*  int carta0 = dealer.GetComponent<CardHand>().cards[0].GetComponent<CardHand>().points;
+
+          //CASO 1
+          float valorVisibleDealer =Math.Abs(  carta0-Convert.ToInt32(puntosDealer)) ;//puntos totales del dealer menos los de la carta oculta
+          float casos_posibles = 13 - Convert.ToInt32(puntosPlayer) + valorVisibleDealer;
+          float resultado = casos_posibles / 13f;
+          if (resultado > 1)
+          {
+              resultado = 1;
+          }
+          else
+          {
+              resultado = 0;
+          }
+
+          prob1.text = resultado.ToString();*/
+        //CASO 2
+        int pPlayer = player.GetComponent<CardHand>().points;
+        float probabilidad2;
+        int casosPosibles2;
+        casosPosibles2 = 13 - (21 - pPlayer);
+        probabilidad2 = casosPosibles2 / 13f;
+        if (probabilidad2 > 1)
+        {
+            probabilidad2 = 1;
+        }
+        else if (probabilidad2 < 0)
+        {
+            probabilidad2 = 0;
+        }
+        if (pPlayer < 12)
+        {
+            probabilidad2 = 0;
+        }
+        prob1.text = (probabilidad2 * 100).ToString() + " %";
+
     }
 
     void PushDealer()
@@ -200,6 +246,7 @@ public class Deck : MonoBehaviour
         resta10Button.interactable = false;
         apuesta10Button.interactable = false;
         //si el player tiene mas de 21
+       // CalculateProbabilities();
         if (player.GetComponent<CardHand>().points > 21)
         {
             finalMessage.text = "Tu puntuación es mayor que 21";
